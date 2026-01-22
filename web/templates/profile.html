@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vehicle Profile</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+<div class="container">
+  <h1>Vehicle Details</h1>
+  <form id="vehicleForm">
+    <label>Vehicle Number</label>
+    <input type="text" id="vehicleNumber" name="vehicle_number" readonly />
+
+    <label>Vehicle Type</label>
+    <input type="text" id="vehicleType" name="vehicle_type" placeholder="Car / Bike / Truck" />
+
+    <label>Owner Contact</label>
+    <input type="text" id="ownerContact" name="owner_contact" placeholder="Enter contact number" />
+
+    <button type="submit">Save</button>
+  </form>
+  <p id="responseMessage"></p>
+</div>
+
+<script>
+  const vehicleData = JSON.parse(localStorage.getItem("vehicleData") || "{}");
+  document.getElementById("vehicleNumber").value = vehicleData.vehicle_number || "";
+
+  document.getElementById("vehicleForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please login first");
+      return;
+    }
+
+    const payload = {
+      vehicle_number: document.getElementById("vehicleNumber").value,
+      vehicle_type: document.getElementById("vehicleType").value,
+      owner_contact: document.getElementById("ownerContact").value
+    };
+
+    fetch("/api/v1/vehicle", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify(payload)
+    })
+            .then(res => res.json())
+            .then(data => {
+              document.getElementById("responseMessage").innerText = "Vehicle registered with FASTag: " + data.fastag;
+            })
+            .catch(err => {
+              document.getElementById("responseMessage").innerText = "Failed to register vehicle";
+            });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login | Parking Ping</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+<div class="container">
+    <h2>Login</h2>
+
+    <input type="text" id="phone" placeholder="Enter phone number" />
+    <button onclick="sendOTP()">Send OTP</button>
+
+    <div id="otp-section" style="display:none;">
+        <input type="text" id="otp" placeholder="Enter OTP" />
+        <button onclick="verifyOTP()">Verify</button>
+    </div>
+</div>
+
+<script src="/static/js/auth.js"></script>
+</body>
+</html>

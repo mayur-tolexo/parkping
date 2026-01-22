@@ -35,3 +35,14 @@ func Auth(next http.HandlerFunc) http.HandlerFunc {
 		next(w, r.WithContext(ctx))
 	}
 }
+
+func WebAuth(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("token")
+		if err != nil || cookie.Value == "" {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+		next(w, r)
+	}
+}

@@ -38,6 +38,7 @@ func main() {
 
 	// Register all routes
 	routes.RegisterRoutes(r, database)
+	routes.RegisterWebRoutes(r)
 
 	// Get port from env or default to 8080
 	port := os.Getenv("APP_PORT")

@@ -18,18 +18,21 @@ func RegisterRoutes(r *mux.Router, db *gorm.DB) {
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	// Auth routes
+	v1 := r.PathPrefix("/api/v1").Subrouter()
 	authHandler := auth.NewHandler(db)
-	r.HandleFunc("/auth/send-otp", authHandler.SendOTP).Methods("POST")
-	r.HandleFunc("/auth/verify-otp", authHandler.VerifyOTP).Methods("POST")
+	v1.HandleFunc("/auth/send-otp", authHandler.SendOTP).Methods("POST")
+	v1.HandleFunc("/auth/verify-otp", authHandler.VerifyOTP).Methods("POST")
 
 	// Vehicle routes
 	vehicleHandler := vehicle.NewHandler(db)
 
-	r.HandleFunc("/vehicle", middleware.Auth(vehicleHandler.Create)).Methods("POST")
-	r.HandleFunc("/vehicle/lookup", middleware.Auth(vehicleHandler.Lookup)).Methods("GET")
+	v1.HandleFunc("/vehicle", middleware.Auth(vehicleHandler.Create)).Methods("POST")
+	v1.HandleFunc("/vehicle/lookup", middleware.Auth(vehicleHandler.Lookup)).Methods("GET")
+	v1.HandleFunc("/vehicle/qr", vehicleHandler.QR).Methods("GET")
+	v1.HandleFunc("/scan/image", vehicleHandler.ScanImage).Methods("POST")
 
 	// Contact routes
 	contactHandler := contact.NewHandler(db)
-	r.HandleFunc("/contact/call", middleware.Auth(contactHandler.Call)).Methods("POST")
-	r.HandleFunc("/contact/message", middleware.Auth(contactHandler.Message)).Methods("POST")
+	v1.HandleFunc("/contact/call", middleware.Auth(contactHandler.Call)).Methods("POST")
+	v1.HandleFunc("/contact/message", middleware.Auth(contactHandler.Message)).Methods("POST")
 }
