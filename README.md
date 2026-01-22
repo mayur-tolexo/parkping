@@ -27,3 +27,17 @@ If a vehicle is wrongly parked or in an emergency:
 - **API Docs:** swaggo/swag (Swagger)
 - **Containerization:** Docker
 - **Orchestration:** Docker Compose
+
+---
+## Sample .env
+```sh
+APP_ENV=dev
+APP_PORT=8080
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=appdb
+DB_SSLMODE=disable
+```
