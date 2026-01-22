@@ -1,0 +1,227 @@
+basePath: /
+definitions:
+  auth.VerifyOTPRequest:
+    properties:
+      otp:
+        type: string
+      phone:
+        type: string
+    type: object
+  contact.ContactRequest:
+    properties:
+      fastag:
+        type: string
+      message:
+        type: string
+      type:
+        description: call | message
+        type: string
+    type: object
+  vehicle.CreateVehicleRequest:
+    properties:
+      fastag_number:
+        type: string
+      vehicle_number:
+        type: string
+      vehicle_type:
+        type: string
+    type: object
+  vehicle.VehicleLookupResponse:
+    properties:
+      calls_enabled:
+        type: boolean
+      messages_enabled:
+        type: boolean
+      vehicle_number:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@parkping.io
+    name: ParkPing Support
+  description: Contact vehicle owners via Fastag or vehicle number
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://parkping.io/terms
+  title: ParkPing API
+  version: "1.0"
+paths:
+  /auth/verify-otp:
+    post:
+      consumes:
+      - application/json
+      description: Verifies OTP and returns JWT token
+      parameters:
+      - description: Verify OTP
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.VerifyOTPRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Verify OTP and login
+      tags:
+      - Auth
+  /contact/call:
+    post:
+      consumes:
+      - application/json
+      description: Initiates a masked call to the vehicle owner using Fastag
+      parameters:
+      - description: Fastag contact request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/contact.ContactRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: call initiated
+          schema:
+            type: string
+        "400":
+          description: invalid request
+          schema:
+            type: string
+        "401":
+          description: unauthorized
+          schema:
+            type: string
+        "403":
+          description: calls disabled
+          schema:
+            type: string
+        "404":
+          description: vehicle not found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Call vehicle owner (masked call)
+      tags:
+      - Contact
+  /contact/message:
+    post:
+      consumes:
+      - application/json
+      description: Sends a predefined or custom message to the vehicle owner using
+        Fastag
+      parameters:
+      - description: Fastag message request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/contact.ContactRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message sent
+          schema:
+            type: string
+        "400":
+          description: invalid request
+          schema:
+            type: string
+        "401":
+          description: unauthorized
+          schema:
+            type: string
+        "403":
+          description: messages disabled
+          schema:
+            type: string
+        "404":
+          description: vehicle not found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Send message to vehicle owner
+      tags:
+      - Contact
+  /vehicle:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Vehicle details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/vehicle.CreateVehicleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Register vehicle
+      tags:
+      - Vehicle
+  /vehicle/lookup:
+    get:
+      description: Returns vehicle details and contact permissions using Fastag number
+      parameters:
+      - description: Fastag number
+        in: query
+        name: fastag
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/vehicle.VehicleLookupResponse'
+        "400":
+          description: missing fastag
+          schema:
+            type: string
+        "401":
+          description: unauthorized
+          schema:
+            type: string
+        "404":
+          description: vehicle not found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Lookup vehicle by Fastag
+      tags:
+      - Vehicle
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

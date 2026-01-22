@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: parkping-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: parkping
+      POSTGRES_PASSWORD: parkping123
+      POSTGRES_DB: parkping
+    volumes:
+      - parkping_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  api:
+    build: .
+    container_name: parkping-api
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      APP_ENV: prod
+      APP_PORT: 8080
+      DATABASE_URL: postgres://parkping:parkping123@db:5432/parkping?sslmode=disable
+      JWT_SECRET: supersecret
+    ports:
+      - "8080:8080"
+
+volumes:
+  parkping_data:
